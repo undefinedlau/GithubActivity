@@ -1,3 +1,5 @@
+// Brian Lau, Karen Chan
+
 /* We have created swap1.sh and doswap.sh, along with figuring out the commands on how to properly swap between "activity" docker (original) 
 and our modified docker (which we called "hw4") */
 
