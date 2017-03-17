@@ -1,0 +1,37 @@
+/* We have created swap1.sh and doswap.sh, along with figuring out the commands on how to properly swap between "activity" docker (original) 
+and our modified docker (which we called "hw4") */
+
+
+
+For the manual portion:
+cd Downloads/hw4-hotswap // to go to my own directory
+ls
+docker images // to show that activity, ng, and hw4 exist
+docker ps -a // every docker ps -a from now on will be for demonstrating the proper processes
+docker rm -f $(docker ps -qa) // remove existing processes
+docker ps -a
+./dorun.sh // initial setup
+docker ps -a
+// prove that original is working -> go online
+docker run -dP --net ecs189_default --name web2 hw4
+docker ps -a
+docker exec ecs189_proxy_1 /bin/bash /bin/swap2.sh
+docker rm -f sha_of_activity
+docker ps -a
+// prove that the swap worked -> go online
+docker run -dP --net ecs189_default --name web1 activity
+docker exec ecs189_proxy_1 /bin/bash /bin/swap1.sh
+docker rm -f sha_of_hw4
+
+
+
+For the EC file:
+./dorun.sh
+docker ps -a
+// prove that original is working
+./doswap.sh activity
+// prove that the new one is working
+docker ps -a
+./doswap.sh hw4
+// prove that it is reverted
+docker ps -a
