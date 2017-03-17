@@ -1,0 +1,31 @@
+cd Downloads/hw4-hotswap
+ls
+docker images // to show that activity, ng, and hw4 exist
+docker ps -a
+docker rm -f $(docker ps -qa)
+docker ps -a
+./dorun.sh
+docker ps -a
+// prove that original is working 
+docker run -dP --net ecs189_default --name web2 hw4
+docker ps -a
+docker exec ecs189_proxy_1 /bin/bash /bin/swap2.sh
+docker rm -f shaofactivity
+docker ps -a
+// prove that the swap worked
+docker run -dP --net ecs189_default --name web1 activity
+docker exec ecs189_proxy_1 /bin/bash /bin/swap1.sh
+docker rm -f shaofhw4
+
+
+
+For the EC file:
+./dorun.sh
+docker ps -a
+// prove that original is working
+./doswap.sh activity
+// prove that the new one is working
+docker ps -a
+./doswap.sh hw4
+// prove that it is reverted
+docker ps -a
