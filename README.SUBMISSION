@@ -1,33 +1,34 @@
 // Brian Lau, Karen Chan
 
 /* We have created swap1.sh and doswap.sh, along with figuring out the commands on how to properly swap between "activity" docker (original) 
-and our modified docker (which we called "hw4") */
+and our modified docker (which we called "hw4"). */
+
+
+The file we have modified is swap1.sh. Swap1.sh replaces the web2 with web1 (similar to swap2.sh).
+
+The extra credit shell script is doswap.sh in the HW4 folder. In order to run doswap.sh, you must run dorun.sh first. 
+
+To do the hotswaps manually, follow these steps: 
+
+1) cd Downloads/hw4-hotswap //Enter the directory of HW4 hot swap 
+2) ls //show contents
+3) docker images //Displays the images (show activity, ng, and hw4 exist)
+4) docker ps -a 
+5) ./dorun.sh //Run the shell script
+6) docker ps -a  
+7) docker run -dP --net ecs189_default --name web2 hw4 // prove that original is working
+8) docker ps -a
+9) docker exec ecs189_proxy_1 /bin/bash /bin/swap2.sh
+10) docker rm -f [shaofactivity] //Replace with SHA 
+11) docker ps -a // prove that the swap worked
+12) docker run -dP --net ecs189_default --name web1 activity
+13) docker exec ecs189_proxy_1 /bin/bash /bin/swap1.sh
+14) docker rm -f shaofhw4
 
 
 
-For the manual portion:
-cd Downloads/hw4-hotswap // to go to my own directory
-ls
-docker images // to show that activity, ng, and hw4 exist
-docker ps -a // every docker ps -a from now on will be for demonstrating the proper processes
-docker rm -f $(docker ps -qa) // remove existing processes
-docker ps -a
-./dorun.sh // initial setup
-docker ps -a
-// prove that original is working -> go online
-docker run -dP --net ecs189_default --name web2 hw4
-docker ps -a
-docker exec ecs189_proxy_1 /bin/bash /bin/swap2.sh
-docker rm -f sha_of_activity
-docker ps -a
-// prove that the swap worked -> go online
-docker run -dP --net ecs189_default --name web1 activity
-docker exec ecs189_proxy_1 /bin/bash /bin/swap1.sh
-docker rm -f sha_of_hw4
 
-
-
-For the EC file:
+To do the hotswap with the doswap.sh file, follow these steps:
 ./dorun.sh
 docker ps -a
 // prove that original is working
@@ -37,3 +38,54 @@ docker ps -a
 ./doswap.sh hw4
 // prove that it is reverted
 docker ps -a
+
+
+
+OTHER NOTES: (manually commands with further notes)
+./dorun.sh
+- docker run -d -P —net ecs189_default —name web2 hw4
+- docker exec ecs189_proxy_1 /bin/bash /bin/swap2.sh
+- docker ps -a
+- docker rm -f af6a (web2)
+- docker exec ecs189_proxy_1 /bin/bash /bin/swap1.sh
+- docker ps -a
+- See local host docker ps -a
+- time to kill activity (don’t kill web2)
+- docker rm -f 7122
+- exit with code 137 is okay
+- docker ps -a
+- go check localhost:8888 //Check on the website 
+- docker run -dP —net ecs189_default —name web1 activity
+- docker exec ecs189_proxy /bin/bash /bin/swap1.sh
+- run it again and execute again 
+
+
+-----
+
+docker-compose.yml 
+  This file brings up two containers. 
+
+cleanup.sh (no arguments) 
+  This file cleans up "zombie" docker images that are halted 
+ 
+dorun.sh (no arguments) 
+  1) this shell uses the yml file to bring up the docker network
+  2) when the nginx comes up, it's pointing at the UC Davis engineering school. 
+  3) once the network comes up, it tells the nginx container, using the "init.sh" shell
+  script (see the directory below) to redirect the requests to the actual working directory. 
+  4) Note that the dorun.sh uses docker-compose command? Where does this command look for more details? 
+  5) What does the "-p" option do? Look it up in teh dcoumentation
+  6) What does the "docker exec... init.sh" do? why is there a sleep before it? 
+  
+
+doswap.sh 
+  1) if the current "live" container is named web1, then, it kills any existing one named
+      web2 brings up the new DDD named  web2. 
+  2) it tells the nginx to send the requests henceforth to web2. (using the swap1 shell script) 
+  3) it kills the web1
+  4) if the otherway around web1<->web2 using Swap2 shell script. 
+  5) HINT: Be Careful, to give enough time (using "sleep n" for n seconds) for things to happen in sequence. 
+  6) HINT: you may have to kill existing containers just make sure it's workign fine. Look at the "killitif" reoutine
+ 
+  
+ 
